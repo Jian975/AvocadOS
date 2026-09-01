@@ -10,6 +10,8 @@ extern "C" {
 __attribute__((__noreturn__))
 void abort(void);
 
+#define EOVERFLOW 2
+
 #ifdef __cplusplus
 }
 #endif
