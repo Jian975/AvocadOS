@@ -1,9 +1,11 @@
 #ifndef _GDT_H
 #define _GDT_H
 
+#include <stdint.h>
+
 //Define flags
 #define SEG_DESCTYPE(x) ((x) << 0x04)//Descriptor type (0 for system, 1 for code/data)
-#define SEG_PRES(X)     ((x) << 0x07)//Present
+#define SEG_PRES(x)     ((x) << 0x07)//Present
 #define SEG_SAVL(x)     ((x) << 0x0C)//Available for system use
 #define SEG_LONG(x)     ((x) << 0x0D)//Long mode
 #define SEG_SIZE(x)     ((x) << 0x0E)//Size (0 for 16-bit, 1 for 32)
@@ -27,6 +29,21 @@
 #define SEG_CODE_EXRDC          0x0E//Execute/Read, conforming
 #define SEG_CODE_EXRDCA         0x0F//Execute/Read, conforming, accessed
 
+#define GDT_CODE_PL0            SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                                SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
+                                SEG_PRIV(0) | SEG_CODE_EXRD
+#define GDT_DATA_PL0            SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                                SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
+                                SEG_PRIV(0) | SEG_DATA_RDWR
+#define GDT_CODE_PL3            SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                                SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
+                                SEG_PRIV(3) | SEG_CODE_EXRD
+#define GDT_DATA_PL3            SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                                SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
+                                SEG_PRIV(3) | SEG_DATA_RDWR
+
+#define GDT_ENTRY_COUNT         5
+
 struct GDT {
      uint16_t size;
      uint32_t address;
@@ -44,6 +61,9 @@ typedef union {
      uint64_t raw;
 } GDTEntry;
 
-void initialize_gdt_entry(uint32_t base, uint32_t limit, uint16_t flag);
+void set_gdt_entry(GDTEntry * target, uint32_t base, uint32_t limit, uint16_t flag);
 
+void init_gdt(void);
+
+extern void gdt_flush(struct GDT * gdt);
 #endif
