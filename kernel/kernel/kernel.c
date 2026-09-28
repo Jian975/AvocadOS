@@ -6,6 +6,7 @@
 void kernel_main(void) {
      terminal_initialize();
      init_gdt();
+     printf("GDB Initialized\n");
      printf("Hello from AvocadOS!\n");
      printf("I'm on a new line :O\n");
      printf("Wow is that a cursor below me?!?\n");

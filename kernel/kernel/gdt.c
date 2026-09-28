@@ -1,5 +1,12 @@
 #include <kernel/gdt.h>
 
+static GDTEntry entries[GDT_ENTRY_COUNT];
+static struct GDT gdt = {
+    .size = sizeof(entries) - 1,
+    .address = (uint32_t) entries,
+};
+
+
 void set_gdt_entry(GDTEntry * target, uint32_t base, uint32_t limit, uint16_t flag) {
      uint64_t descriptor;
 
@@ -21,12 +28,6 @@ void set_gdt_entry(GDTEntry * target, uint32_t base, uint32_t limit, uint16_t fl
 }
 
 void init_gdt() {
-      GDTEntry entries[GDT_ENTRY_COUNT];
-      struct GDT gdt = {
-         .size = sizeof(entries) - 1,
-         .address = (uint32_t) entries,
-    };
-
     set_gdt_entry(&entries[0], 0, 0, 0);
     set_gdt_entry(&entries[1], 0, 0x000FFFFF, (GDT_CODE_PL0));
     set_gdt_entry(&entries[2], 0, 0x000FFFFF, (GDT_DATA_PL0));
