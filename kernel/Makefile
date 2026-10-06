@@ -32,6 +32,10 @@ $(KERNEL_ARCH_OBJS) \
 kernel/kernel.o \
 kernel/gdt.o \
 kernel/gdt_flush.o \
+kernel/idt.o \
+kernel/idt_flush.o \
+kernel/isr.o \
+kernel/isr_helper.o \
 
 OBJS=\
 $(ARCHDIR)/crti.o \

@@ -19,11 +19,11 @@ struct IDT {
      uint32_t address;
 } __attribute((packed));
 
-struct IDTEntry idt[256];
-struct IDT idt_ptr;
-
 //in asm
-extern void idt_load();
+extern void idt_flush(struct IDT * idt);
+
+extern void isrs_install();
+
 void idt_set_gate(uint8_t, uint32_t, uint16_t, uint8_t);
 void init_idt(void);
 #endif
