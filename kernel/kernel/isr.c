@@ -3,6 +3,41 @@
 #include <stdint.h>
 #include <stdio.h>
 
+const char * exception_messages[] = {
+     "Division By Zero",
+     "Debug",
+     "Non Maskable Interrupt",
+     "Breakpoint",
+     "Into Detected OVerflow",
+     "Out of Bounds",
+     "Invalid Opcode",
+     "No Coprocessor",
+     "Double Fault",
+     "Coprocessor Segment Overrun",
+     "Invalid TSS",
+     "Segment Not Present",
+     "Stack-Segment Fault",
+     "General Protection",
+     "Page Fault",
+     "Intel Reserved",
+     "Floating-Point Error",
+     "Alignment Check",
+     "Machine Check",
+     "SIMD Floating-Point Error",
+     "Virtualization",
+     "Control Protection",
+     "Reserved",
+     "Reserved",
+     "Reserved",
+     "Reserved",
+     "Reserved",
+     "Reserved",
+     "Reserved",
+     "Reserved",
+     "Reserved",
+     "Reserved"
+};
+
 void isrs_install() {
      idt_set_gate(0, (unsigned) isr0, 0x08, 0x8E);
      idt_set_gate(1, (unsigned) isr1, 0x08, 0x8E);
@@ -44,4 +79,8 @@ void fault_handler(struct regs * r) {
           printf(" Exception. System Halted!\n");
           for (;;);
      }
+}
+
+void test_msg() {
+     printf("Test message printed\n");
 }

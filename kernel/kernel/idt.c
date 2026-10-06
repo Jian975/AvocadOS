@@ -1,4 +1,5 @@
 #include <kernel/idt.h>
+#include <kernel/irq.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -23,6 +24,7 @@ void init_idt() {
 
      //add interrupt service routines
      isrs_install();
+     irq_install();
 
      //store to register
      idt_flush(&idt_ptr);

@@ -34,40 +34,7 @@ extern void isr29();
 extern void isr30();
 extern void isr31();
 
-unsigned char * exception_messages[] = {
-     "Division By Zero",
-     "Debug",
-     "Non Maskable Interrupt",
-     "Breakpoint",
-     "Into Detected OVerflow",
-     "Out of Bounds",
-     "Invalid Opcode",
-     "No Coprocessor",
-     "Double Fault",
-     "Coprocessor Segment Overrun",
-     "Invalid TSS",
-     "Segment Not Present",
-     "Stack-Segment Fault",
-     "General Protection",
-     "Page Fault",
-     "Intel Reserved",
-     "Floating-Point Error",
-     "Alignment Check",
-     "Machine Check",
-     "SIMD Floating-Point Error",
-     "Virtualization",
-     "Control Protection",
-     "Reserved",
-     "Reserved",
-     "Reserved",
-     "Reserved",
-     "Reserved",
-     "Reserved",
-     "Reserved",
-     "Reserved",
-     "Reserved",
-     "Reserved"
-};
+extern const char * exception_messages[];
 
 //What the stack looks like after an ISR was running
 struct regs {
@@ -76,6 +43,8 @@ struct regs {
      unsigned int int_no, err_code;//'push byte #' and encodes do this
      unsigned int eip, cs, eflags, useresp, ss;//Pushed by the processor automatically
 };
+
+void test_msg();
 
 void isrs_install();
 

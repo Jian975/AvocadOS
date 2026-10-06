@@ -305,6 +305,150 @@ isr31:
      jmp        isr_common_stub
 .size isr31, .-isr31
 
+# 32: IRQ0
+.global irq0
+.type irq0, @function
+irq0:
+     push       0
+     push       32
+     jmp        irq_common_stub
+.size irq0, .-irq0
+
+# 33: IRQ1
+.global irq1
+.type irq1, @function
+irq1:
+     push       0
+     push       33
+     jmp        irq_common_stub
+.size irq1, .-irq1
+
+# 34: IRQ2
+.global irq2
+.type irq2, @function
+irq2:
+     push       0
+     push       34
+     jmp        irq_common_stub
+.size irq2, .-irq2
+
+# 35: IRQ3
+.global irq3
+.type irq3, @function
+irq3:
+     push       0
+     push       35
+     jmp        irq_common_stub
+.size irq3, .-irq3
+
+# 36: IRQ4
+.global irq4
+.type irq4, @function
+irq4:
+     push       0
+     push       36
+     jmp        irq_common_stub
+.size irq4, .-irq4
+
+# 37: IRQ5
+.global irq5
+.type irq5, @function
+irq5:
+     push       0
+     push       37
+     jmp        irq_common_stub
+.size irq5, .-irq5
+
+# 38: IRQ6
+.global irq6
+.type irq6, @function
+irq6:
+     push       0
+     push       38
+     jmp        irq_common_stub
+.size irq6, .-irq6
+
+# 39: IRQ7
+.global irq7
+.type irq7, @function
+irq7:
+     push       0
+     push       39
+     jmp        irq_common_stub
+.size irq7, .-irq7
+
+# 40: IRQ8
+.global irq8
+.type irq8, @function
+irq8:
+     push       0
+     push       40
+     jmp        irq_common_stub
+.size irq8, .-irq8
+
+# 41: IRQ9
+.global irq9
+.type irq9, @function
+irq9:
+     push       0
+     push       41
+     jmp        irq_common_stub
+.size irq9, .-irq9
+
+# 42: IRQ10
+.global irq10
+.type irq10, @function
+irq10:
+     push       0
+     push       42
+     jmp        irq_common_stub
+.size irq10, .-irq10
+
+# 43: IRQ11
+.global irq11
+.type irq11, @function
+irq11:
+     push       0
+     push       43
+     jmp        irq_common_stub
+.size irq11, .-irq11
+
+# 44: IRQ12
+.global irq12
+.type irq12, @function
+irq12:
+     push       0
+     push       44
+     jmp        irq_common_stub
+.size irq12, .-irq12
+
+# 45: IRQ13
+.global irq13
+.type irq13, @function
+irq13:
+     push       0
+     push       45
+     jmp        irq_common_stub
+.size irq13, .-irq13
+
+# 46: IRQ14
+.global irq14
+.type irq14, @function
+irq14:
+     push       0
+     push       46
+     jmp        irq_common_stub
+.size irq14, .-irq14
+
+# 47: IRQ15
+.global irq15
+.type irq15, @function
+irq15:
+     push       0
+     push       47
+     jmp        irq_common_stub
+.size irq15, .-irq15
+
 .global isr_common_stub
 .type isr_common_stub, @function
 isr_common_stub:
@@ -330,3 +474,30 @@ isr_common_stub:
      add        esp, 8
      iret
 .size isr_common_stub, .-isr_common_stub
+
+.global irq_common_stub
+.type irq_common_stub, @function
+irq_common_stub:
+     pusha
+     push       ds
+     push       es
+     push       fs
+     push       gs
+     mov        ax, 0x10        # Load the kernel data segment descriptor
+     mov        ds, ax
+     mov        es, ax
+     mov        fs, ax
+     mov        gs, ax
+     mov        eax, esp
+     push       eax
+     call       irq_handler      # in C file
+     pop        eax
+     pop        gs
+     pop        fs
+     pop        es
+     pop        ds
+     popa
+     add        esp, 8
+     sti
+     iret
+.size irq_common_stub, .-irq_common_stub

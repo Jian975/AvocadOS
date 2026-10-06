@@ -36,6 +36,8 @@ kernel/idt.o \
 kernel/idt_flush.o \
 kernel/isr.o \
 kernel/isr_helper.o \
+kernel/irq.o \
+kernel/timer.o \
 
 OBJS=\
 $(ARCHDIR)/crti.o \
