@@ -3,7 +3,7 @@
 #include <kernel/tty.h>
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
-#include <kernel/timer.h>
+#include <kernel/keyboard.h>
 
 void init_tables() {
      init_gdt();
@@ -17,6 +17,6 @@ void kernel_main(void) {
      terminal_initialize();
      init_tables();
      printf("Hello from AvocadOS!\n");
-     timer_install();
+     keyboard_install();
      asm volatile("sti");
 }

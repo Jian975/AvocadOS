@@ -1,7 +1,7 @@
 #ifndef _TIMER_H
 #define _TIMER_H
 
-#include <kernel/isr.h>
+#include <kernel/common_low.h>
 
 void timer_phase(int);
 void timer_handler(struct regs *);

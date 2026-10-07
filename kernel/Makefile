@@ -38,6 +38,7 @@ kernel/isr.o \
 kernel/isr_helper.o \
 kernel/irq.o \
 kernel/timer.o \
+kernel/keyboard.o \
 
 OBJS=\
 $(ARCHDIR)/crti.o \

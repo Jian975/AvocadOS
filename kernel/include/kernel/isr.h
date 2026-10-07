@@ -1,5 +1,8 @@
 #ifndef _ISR_H
 #define _ISR_H
+
+#include <kernel/common_low.h>
+
 // In isr.S
 extern void isr0();
 extern void isr1();
@@ -35,16 +38,6 @@ extern void isr30();
 extern void isr31();
 
 extern const char * exception_messages[];
-
-//What the stack looks like after an ISR was running
-struct regs {
-     unsigned int gs, fs, es, ds;//Pushed the segs last
-     unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;//pushed by pusha
-     unsigned int int_no, err_code;//'push byte #' and encodes do this
-     unsigned int eip, cs, eflags, useresp, ss;//Pushed by the processor automatically
-};
-
-void test_msg();
 
 void isrs_install();
 
