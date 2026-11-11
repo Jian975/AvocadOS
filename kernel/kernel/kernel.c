@@ -16,7 +16,9 @@ void init_tables() {
 void kernel_main(void) {
      terminal_initialize();
      init_tables();
-     printf("Hello from AvocadOS!\n");
      keyboard_install();
-     asm volatile("sti");
+     printf("Hello from AvocadOS!\n");
+     //keep the kernel running
+     for (;;)
+          asm volatile ("sti; hlt" ::: "memory");
 }

@@ -1,9 +1,7 @@
 #include <kernel/idt.h>
 #include <kernel/irq.h>
 #include <kernel/io.h>
-#include <stdio.h>
 #include <stdint.h>
-#include <string.h>
 
 //Array of function pointers
 //Handles custom IRQ handlers for a given IRQ
@@ -25,6 +23,7 @@ void irq_uninstall_handler(int irq) {
 //So we manually map them to IDT entries 32 to 47
 //0x20 = master PIC command
 //0xA0 = slave PIC command
+//All registers are masked right now, unmask them as needed
 void irq_remap() {
      outb(0x20, 0x11);
      outb(0xA0, 0x11);
@@ -34,8 +33,8 @@ void irq_remap() {
      outb(0xA1, 0x02);
      outb(0x21, 0x01);
      outb(0xA1, 0x01);
-     outb(0x21, 0x0);
-     outb(0xA1, 0x0);
+     outb(0x21, 0xFF);
+     outb(0xA1, 0xFF);
 }
 
 void irq_install() {
@@ -66,8 +65,6 @@ void irq_handler(struct regs * r) {
      if (handler) {
           handler(r);
      }
-
-     printf("EOI\n");
 
      //If the IDT entry invoked was greater than 40, we need an EOI to the slave PIC
      if (r -> int_no >= 40) {

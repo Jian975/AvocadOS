@@ -3,6 +3,81 @@
 #include <kernel/io.h>
 #include <stdio.h>
 
+#define KEYBOARD_CONTROLLER_STATUS_PORT 0x64
+#define KEYBOARD_CONTROLLER_DATA_PORT 0x60
+#define PIC_MASTER_DATA_PORT 0x21
+#define DISABLE_KEYBOARD_CONTROLLER 0xAD
+#define ENABLE_KEYBOARD_CONTROLLER 0xAE
+#define KEYBOARD_CONTROLLER_READ_COMMAND 0x20
+#define KEYBOARD_CONTROLLER_WRITE_COMMAND 0x60
+#define KEYBOARD_CONTROLLER_ENABLE_SCANNING 0xF4
+#define KEYBOARD_CONTROLLER_ACKNOALEDGE 0xFA
+
+static int wait_input_buffer_clear(void) {
+  for (unsigned int timeout = 0; timeout < 100000; timeout++) {
+    if (!(inb(KEYBOARD_CONTROLLER_STATUS_PORT) & 0x02))
+      return 1;
+  }
+  return 0;
+}
+
+static int wait_output_buffer_full(void) {
+  for (unsigned int timeout = 0; timeout < 100000; timeout++) {
+    if (inb(KEYBOARD_CONTROLLER_STATUS_PORT) & 0x01)
+      return 1;
+  }
+  return 0;
+}
+
+static int keyboard_controller_enable_irq(void) {
+  if (!wait_input_buffer_clear())
+    return 0;
+  outb(KEYBOARD_CONTROLLER_STATUS_PORT, DISABLE_KEYBOARD_CONTROLLER);
+
+  for (unsigned int timeout = 0; timeout < 100000; timeout++) {
+    if (!(inb(KEYBOARD_CONTROLLER_STATUS_PORT) & 0x01))
+      break;
+    inb(KEYBOARD_CONTROLLER_DATA_PORT);
+  }
+
+  if (!wait_input_buffer_clear())
+    return 0;
+  outb(KEYBOARD_CONTROLLER_STATUS_PORT, KEYBOARD_CONTROLLER_READ_COMMAND);
+  if (!wait_output_buffer_full())
+    return 0;
+
+  unsigned char command_byte = inb(KEYBOARD_CONTROLLER_DATA_PORT);
+  command_byte |= 0x40;// Set bit 6, enable scan-code translation
+  command_byte &= ~0x11;// Clear bits 0 and 4, disable keyboard IRQ generation and clears keyboard interface disabled flag
+
+  if (!wait_input_buffer_clear())
+    return 0;
+  outb(KEYBOARD_CONTROLLER_STATUS_PORT, KEYBOARD_CONTROLLER_WRITE_COMMAND);
+  if (!wait_input_buffer_clear())
+    return 0;
+  outb(KEYBOARD_CONTROLLER_DATA_PORT, command_byte);
+  if (!wait_input_buffer_clear())
+    return 0;
+  outb(KEYBOARD_CONTROLLER_STATUS_PORT, ENABLE_KEYBOARD_CONTROLLER);
+
+  if (!wait_input_buffer_clear())
+    return 0;
+  outb(KEYBOARD_CONTROLLER_DATA_PORT, KEYBOARD_CONTROLLER_ENABLE_SCANNING);
+  if (!wait_output_buffer_full())
+    return 0;
+  if (inb(KEYBOARD_CONTROLLER_DATA_PORT) != KEYBOARD_CONTROLLER_ACKNOALEDGE)
+    return 0;
+
+  command_byte |= 0x01;
+  if (!wait_input_buffer_clear())
+    return 0;
+  outb(KEYBOARD_CONTROLLER_STATUS_PORT, KEYBOARD_CONTROLLER_WRITE_COMMAND);
+  if (!wait_input_buffer_clear())
+    return 0;
+  outb(KEYBOARD_CONTROLLER_DATA_PORT, command_byte);
+  return 1;
+}
+
 //US keyboard, scan code -> char
 unsigned char kbdus[128] =
 {
@@ -45,14 +120,17 @@ unsigned char kbdus[128] =
 };
 
 void keyboard_handler(struct regs * r) {
-     unsigned char scancode = inb(0x60);
-     if (scancode & 0x80) {//if the key was released
-          //whatever we want
-     } else {//the key was just pressed
-          putchar(kbdus[scancode]);
-     }
+     unsigned char scancode = inb(KEYBOARD_CONTROLLER_DATA_PORT);
+  if (!(scancode & 0x80) && scancode < sizeof(kbdus) && kbdus[scancode])
+    putchar(kbdus[scancode]);
 }
 
 void keyboard_install() {
      irq_install_handler(1, keyboard_handler);
+  if (keyboard_controller_enable_irq()) {
+      outb(PIC_MASTER_DATA_PORT, 0xFD);//unmask IRQ1 (keyboard)
+    printf("Keyboard ready\n");
+  } else {
+    printf("Keyboard init failed\n");
+  }
 }

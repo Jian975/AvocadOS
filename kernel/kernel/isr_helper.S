@@ -498,6 +498,5 @@ irq_common_stub:
      pop        ds
      popa
      add        esp, 8
-     sti
      iret
 .size irq_common_stub, .-irq_common_stub
