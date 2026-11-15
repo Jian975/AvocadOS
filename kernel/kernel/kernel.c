@@ -18,6 +18,8 @@ void kernel_main(void) {
      init_tables();
      keyboard_install();
      printf("Hello from AvocadOS!\n");
+     //printf("Triggering divide-by-zero exception...\n");
+     //asm volatile ("divl %0" : : "r"(0U) : "eax", "edx", "cc");
      //keep the kernel running
      for (;;)
           asm volatile ("sti; hlt" ::: "memory");
